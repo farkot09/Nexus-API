@@ -1,7 +1,9 @@
+require("dotenv").config()
+require("./database/mongoConnect")
 const express = require('express');
 const app = express();
-const cors = require('cors');
-const port = 3000;
+//const cors = require('cors');
+const port = process.env.PORT ;
 const routerApi = require('./routes');
 const {
   logErrors,
@@ -9,20 +11,12 @@ const {
   boomErrorHandler,
 } = require('./middlewares/errorHandler');
 
+
 app.use(express.json());
 
 // inicio configuracion de acceso CORS
-const whiteList = ['http://localhost:3000', 'http://myapp.com'];
-const options = {
-  origin: (origin, callback) => {
-    if (whiteList.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('No permitido'));
-    }
-  },
-};
-app.use(cors(options));
+
+//app.use(cors);
 
 // FIN configuracion de acceso CORS
 

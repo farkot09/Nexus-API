@@ -1,59 +1,134 @@
+require('../database/mongoConnect');
 const boom = require('@hapi/boom');
+const Reserva = require('../schemas/reservas.schema');
+//const mongoose = require('mongoose');
 
 class ReservasServices {
   constructor() {
     this.reservas = [];
-    this.generate();
   }
 
-  async generate() {
-    this.reservas.push({
-      id: '1',
-      swb: 'HLCUBO2210917366',
-      destino: 'CALLAO,PERU',
-    });
-    this.reservas.push({
-      id: '2',
-      swb: 'HLCUBO2907853869',
-      destino: 'SAN ANTONIO,CHILE',
-    });
-  }
+  //CREAR RESERVA
 
   async create(data) {
-    const newReserva = {
-      id: '3',
-      ...data,
-    };
-    this.reservas.push(newReserva);
+    const {
+      numero_reserva,
+      destino,
+      resumen,
+      vassel,
+      //fecha_reserva,
+      //fecha_cierre,
+      activo,
+    } = data;
+    const newReserva = new Reserva({
+      numero_reserva,
+      destino,
+      resumen,
+      vassel,
+      fecha_reserva: new Date(),
+      fecha_cierre: new Date(),
+      activo,
+    });
+    let isSaved = {};
+
+    await newReserva
+      .save()
+      .then((savedRerserva) => {
+        return (isSaved = savedRerserva);
+      })
+      .catch((err) => {
+        return (isSaved = err);
+      });
+
+    if (isSaved.errors) {
+      throw boom.notFound(`Reserva not Created, ${isSaved._message}`);
+    }
     return newReserva;
   }
 
+  //TODAS LAS RESERVAS
+
   async find() {
+    await Reserva.find({}).then((result) => {
+      this.reservas = result;
+    });
     return this.reservas;
   }
 
+  // ENCONTRAR UNA RESERVA
+
   async findOne(id) {
-    const reserva = this.reservas.find((item) => item.id === id);
-    if (!reserva) {
-      throw boom.notFound('reserva not existe');
+    let ifExist = {};
+    await Reserva.findById(id)
+      .then((reserva) => {
+        if(!reserva){
+          return ifExist = {message:"No existe el id"}
+        }
+        return (ifExist = reserva);
+      })
+      .catch((err) => {
+        return (ifExist = err);
+      });
+
+      console.log(ifExist);
+    if (ifExist.message) {
+      throw boom.badRequest(`error, invalid id , ${ifExist.message}`);
     }
-    return reserva;
+    return ifExist;
   }
+
+  // ACTUALIZACION DE RESERVA
 
   async update(id, changes) {
-    const index = this.reservas.findIndex((item) => item.id === id);
-    if (index === -1) {
-      throw boom.notFound('reserva not found');
+    let isUpdate = {};
+    const newReservaInfo = new Reserva({
+      _id: id,
+      numero_reserva: changes.numero_reserva,
+      destino: changes.destino,
+      resumen: changes.resumen,
+      vassel: changes.vassel,
+      fecha_reserva: new Date(),
+      fecha_cierre: new Date(),
+      activo: changes.activo,
+    });
+
+    await Reserva.findByIdAndUpdate(id, newReservaInfo, { new: true })
+      .then((note) => {
+        if(!note){
+          return isUpdate = {message:"No existe el id"}
+        }
+        return (isUpdate = note);
+      })
+      .catch((err) => {
+        return (isUpdate = err);
+      });
+
+    if (isUpdate.message) {
+      throw boom.badRequest(`error not exist or , ${isUpdate.message}`);
     }
-    const reserva = this.reservas[index];
-    this.reservas[index] = {
-      ...reserva,
-      ...changes,
-    };
-    return this.reservas[index];
+
+    return isUpdate;
   }
 
-  async delete() {}
+  async delete(id) {
+    let isDelete = {};
+    await Reserva.findByIdAndRemove(id).then(reserva => {
+      if(!reserva){
+        return isDelete = {message:"No existe el Id"}
+      }
+      return isDelete = reserva
+    }).catch(err => {
+      return isDelete = err
+    })
+    if(isDelete.message){
+      throw boom.badRequest(`error, not exist or, ${isDelete.message}`)
+    }
+    return {
+      message: "ELiminado exitosamente",
+      id,
+    }
+
+  }
 }
 
 module.exports = ReservasServices;
