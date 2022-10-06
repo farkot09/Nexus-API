@@ -1,35 +1,86 @@
-const boom = require("@hapi/boom")
+require('../database/mongoConnect');
+const boom = require('@hapi/boom');
+const Cliente = require('../schemas/clientes.schema');
 
 class ClientesServices {
   constructor() {
     this.clientes = [];
-    this.generate();
   }
 
-  async generate() {
-    this.clientes.push({
-      id: '1',
-      cliente: 'ENCO EXPRES',
-      producto: 'ABONO PARA TIERRA',
+  //CREAR CLIENTE
+
+  async create(data) {
+    const {
+      nit,
+      razon_social,
+      correo,
+      telefono,
+      nombre_contacto,
+      fecha_creacion,
+      activo,
+    } = data;
+    const newCliente = new Cliente({
+      nit,
+      razon_social,
+      correo,
+      telefono,
+      nombre_contacto,
+      fecha_creacion,
+      activo,
     });
-    this.clientes.push({
-      id: '2',
-      cliente: 'SAAT ANDINA',
-      producto: 'LAMBADA 1 LITRO',
-    });
+
+    let isSaved = {};
+
+    await newCliente
+      .save()
+      .then((savedCliente) => {
+        return (isSaved = savedCliente);
+      })
+      .catch((err) => {
+        return (isSaved = err);
+      });
+
+    if (isSaved.errors) {
+      throw boom.notFound(`Cliente Not Created, ${isSaved._message}`);
+    }
+
+    return isSaved;
   }
+
+  // TODOS LOS CLIENTES
 
   async find() {
+    await Cliente.find({}).then((result) => {
+      this.clientes = result;
+    });
+
     return this.clientes;
   }
 
+  //ENCONTRAR UN CLIENTE
+
   async findOne(id) {
-    const cliente = this.clientes.find((item) => item.id === id);
-    if(!cliente){
-      throw boom.notFound("cliente no existe")
+    let ifExist = {};
+    await Cliente.findById(id)
+      .then((cliente) => {
+        if (!cliente) {
+          return (ifExist = { message: 'No existe el id' });
+        }
+        return (ifExist = cliente);
+      })
+      .catch((err) => {
+        return (ifExist = err);
+      });
+    if (ifExist.message) {
+      throw boom.badRequest(`error, invalid id, ${ifExist.message}`);
     }
-    return cliente
+    return ifExist;
   }
+
+  async update(id, changes){
+
+  }
+
 }
 
 module.exports = ClientesServices;

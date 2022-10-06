@@ -2,7 +2,6 @@ require('../database/mongoConnect');
 const boom = require('@hapi/boom');
 const Reserva = require('../schemas/reservas.schema');
 //const mongoose = require('mongoose');
-
 class ReservasServices {
   constructor() {
     this.reservas = [];
@@ -43,7 +42,7 @@ class ReservasServices {
     if (isSaved.errors) {
       throw boom.notFound(`Reserva not Created, ${isSaved._message}`);
     }
-    return newReserva;
+    return isSaved;
   }
 
   //TODAS LAS RESERVAS
@@ -69,8 +68,6 @@ class ReservasServices {
       .catch((err) => {
         return (ifExist = err);
       });
-
-      console.log(ifExist);
     if (ifExist.message) {
       throw boom.badRequest(`error, invalid id , ${ifExist.message}`);
     }

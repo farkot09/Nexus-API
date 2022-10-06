@@ -22,4 +22,14 @@ router.get('/:id', async (req, res, next) => {
     next(error);
   }
 });
+
+router.post("/", async (req, res, next)=>{
+  try {
+    const body = req.body;
+    const newCliente = await service.create(body)
+    res.status(201).json(newCliente);
+  } catch (error) {
+    next(error)
+  }
+})
 module.exports = router;
