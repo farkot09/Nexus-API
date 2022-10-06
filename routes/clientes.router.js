@@ -1,20 +1,25 @@
 const express = require('express');
 const router = express.Router();
-const ClientesServices = require("../services/clientes.services");
+const ClientesServices = require('../services/clientes.services');
 
-const service = new ClientesServices;
+const service = new ClientesServices();
 
-router.get('/', (req, res) => {
-  const clientes = service.find();
-  res.json(clientes);
-
+router.get('/', async (req, res, next) => {
+  try {
+    const clientes = await service.find();
+    res.json(clientes);
+  } catch (error) {
+    next(error)
+  }
 });
 
-router.get('/:id', (req, res) => {
-  const { id } = req.params;
-  const cliente = service.findOne(id);
-  res.json(cliente)
+router.get('/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const cliente = await service.findOne(id);
+    res.json(cliente);
+  } catch (error) {
+    next(error);
+  }
 });
-
-
 module.exports = router;

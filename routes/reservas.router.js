@@ -4,31 +4,37 @@ const ReservasServices = require('../services/reservas.services');
 
 const service = new ReservasServices();
 
-router.get('/', (req, res) => {
-  const reservas = service.find();
+router.get('/', async (req, res) => {
+  const reservas = await service.find();
   res.json(reservas);
 });
 
-router.get('/:id', (req, res) => {
-  const { id } = req.params;
-  const reserva = service.findOne(id);
+router.get('/:id', async (req, res, next) => {
+
+  try {
+    const { id } = req.params;
+  const reserva = await service.findOne(id);
   res.json(reserva);
+  } catch (error) {
+    next(error)
+  }
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const body = req.body;
-  const newReserva = service.create(body);
-  res.status(201).json(newReserva)
+  const newReserva = await service.create(body);
+  res.status(201).json(newReserva);
 });
 
-router.patch('/:id', (req, res) => {
-  const { id } = req.params;
+router.patch('/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
   const body = req.body;
-  res.json({
-    message: 'Actualizacion',
-    id,
-    body,
-  });
+  const updateReserva = await service.update(id, body);
+  res.status(201).json(updateReserva)
+  } catch (error) {
+    next(error)
+  }
 });
 
 module.exports = router;

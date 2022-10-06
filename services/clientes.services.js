@@ -1,10 +1,12 @@
+const boom = require("@hapi/boom")
+
 class ClientesServices {
   constructor() {
     this.clientes = [];
     this.generate();
   }
 
-  generate() {
+  async generate() {
     this.clientes.push({
       id: '1',
       cliente: 'ENCO EXPRES',
@@ -17,12 +19,16 @@ class ClientesServices {
     });
   }
 
-  find() {
+  async find() {
     return this.clientes;
   }
 
-  findOne(id) {
-    return this.clientes.find((item) => item.id === id);
+  async findOne(id) {
+    const cliente = this.clientes.find((item) => item.id === id);
+    if(!cliente){
+      throw boom.notFound("cliente no existe")
+    }
+    return cliente
   }
 }
 
