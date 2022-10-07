@@ -17,6 +17,7 @@ class ReservasServices {
       vassel,
       //fecha_reserva,
       //fecha_cierre,
+     // asignaciones,
       activo,
     } = data;
     const newReserva = new Reserva({
@@ -26,6 +27,7 @@ class ReservasServices {
       vassel,
       fecha_reserva: new Date(),
       fecha_cierre: new Date(),
+      asignaciones: [],
       activo,
     });
     let isSaved = {};
