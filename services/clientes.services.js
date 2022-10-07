@@ -77,10 +77,56 @@ class ClientesServices {
     return ifExist;
   }
 
-  async update(id, changes){
+  async update(id, changes) {
+    let isUpdate = {};
+    const newClienteInfo = new Cliente({
+      _id: id,
+      nit: changes.nit,
+      razon_social: changes.razon_social,
+      correo: changes.correo,
+      telefono: changes.telefono,
+      nombre_contacto: changes.nombre_contacto,
+      fecha_creacion: new Date(),
+      activo: changes.activo,
+    });
 
+    await Cliente.findByIdAndUpdate(id, newClienteInfo, { new: true })
+      .then((cliente) => {
+        if (!cliente) {
+          return (isUpdate = { message: 'No existe el Id' });
+        }
+        return (isUpdate = cliente);
+      })
+      .catch((err) => {
+        return (isUpdate = err);
+      });
+    if (isUpdate.message) {
+      throw boom.badRequest(`error, not exist or, ${isUpdate.message}`);
+    }
+
+    return isUpdate;
   }
 
+  async delete(id) {
+    let isDelete = {};
+    await Cliente.findByIdAndRemove(id)
+      .then((cliente) => {
+        if (!cliente) {
+          return (isDelete = { message: 'Noe existe el Id' });
+        }
+        return (isDelete = cliente);
+      })
+      .catch((err) => {
+        return (isDelete = err);
+      });
+    if (isDelete.message) {
+      throw boom.badRequest(`error, not exist or, ${isDelete.message}`);
+    }
+    return {
+      message: 'Eliminado Exitosamente',
+      id,
+    };
+  }
 }
 
 module.exports = ClientesServices;

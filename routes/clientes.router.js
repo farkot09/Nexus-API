@@ -32,4 +32,26 @@ router.post("/", async (req, res, next)=>{
     next(error)
   }
 })
+
+router.patch("/:id", async (req, res, next) => {
+  try {
+    const {id} = req.params;
+    const body = req.body;
+    const updateCliente = await service.update(id, body)
+    res.json(updateCliente)
+  } catch (error) {
+    next(error)
+  }
+})
+
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const deleteCliente = await service.delete(id);
+    res.json(deleteCliente);
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

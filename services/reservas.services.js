@@ -90,11 +90,11 @@ class ReservasServices {
     });
 
     await Reserva.findByIdAndUpdate(id, newReservaInfo, { new: true })
-      .then((note) => {
-        if(!note){
+      .then((reserva) => {
+        if(!reserva){
           return isUpdate = {message:"No existe el id"}
         }
-        return (isUpdate = note);
+        return (isUpdate = reserva);
       })
       .catch((err) => {
         return (isUpdate = err);
