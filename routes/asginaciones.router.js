@@ -15,6 +15,17 @@ router.post('/subirDocumentos/:id', async (req, res, next) => {
   }
 });
 
+router.post("/cambiarEstado/:id", async (req,res, next) => {
+  try {
+    const {id} = req.params
+    const body = req.body;
+    const newStatus = await service.changeStatusDocument(id,body)
+    res.status(201).json(newStatus);
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 router.post("/", async (req,res, next) => {
   try {

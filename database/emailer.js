@@ -13,13 +13,13 @@ const createTrans = () => {
   return transport
 }
 
-const sendMail = async (id) => {
+const sendMail = async (data) => {
   const transporter = createTrans()
   const info = await transporter.sendMail({
     from:'"MSL Informacion de Asignacion a Reserva" <info@sigicon.com>',
-    to:"viagramo2011@gmail.com, v.grajales@encoexpres.co",
+    to:"viagramo2011@gmail.com",
     subject:"Codigo de Acceso para Carga de Documentacion",
-    html:`<h1>Hola este es tu codigo de acceso para cargar los documentos ${id}</h1>`
+    html:`<h1>Hola este es tu codigo de acceso para cargar los documentos ${data.id}</h1>`
   })
 
   console.log("Message Send", info.messageId);

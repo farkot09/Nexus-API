@@ -5,8 +5,6 @@ const ReservasServices = require('../services/reservas.services');
 const ClientesServices = require('../services/clientes.services');
 const sendMail = require('../database/emailer');
 
-
-
 const Reservaservice = new ReservasServices();
 const Clienteservice = new ClientesServices();
 class AsignacionesServices {
@@ -62,7 +60,7 @@ class AsignacionesServices {
         .then((savedAsignacion) => {
           reserva.asignaciones.push(savedAsignacion._id);
           Reservaservice.update(reserva.id, reserva);
-          sendMail(savedAsignacion._id)
+          sendMail(savedAsignacion._id);
           return (isSaved = savedAsignacion);
         })
         .catch((err) => {
@@ -80,7 +78,6 @@ class AsignacionesServices {
     if (isSaved.errors) {
       throw boom.notFound(`Error al asignar,${isSaved.message}`);
     }
-
 
     return isSaved;
   }
@@ -216,6 +213,52 @@ class AsignacionesServices {
       });
 
     return isUpload;
+  }
+
+  async changeStatusDocument(id, data) {
+    let isUpdate = {};
+    const { tipo_documento, observacion, estado } = data;
+    await Asignacion.findById(id)
+      .then((asignacion) => {
+        if (!asignacion) {
+          return (isUpdate = { message: 'No existe el ID en la asignacion' });
+        }
+
+        const index = asignacion.documentacion.findIndex(
+          (item) => item.tipo_documento === tipo_documento
+        );
+        const newData = {
+          ...asignacion.documentacion[index],
+          estado,
+          observacion,
+        };
+        asignacion.documentacion[index] = newData;
+
+        return (isUpdate = asignacion);
+      })
+      .catch((err) => {
+        return (isUpdate = err);
+      });
+
+    await Asignacion.findByIdAndUpdate(id, isUpdate, { new: true })
+      .then((asignacion) => {
+        if (!asignacion) {
+          return (isUpdate = {
+            message: 'No existe el ID a Actualizar, no es posible',
+          });
+        }
+
+        return (isUpdate = asignacion);
+      })
+      .catch((err) => {
+        return (isUpdate = err);
+      });
+
+    if (isUpdate.message) {
+      throw boom.badRequest(`Error, not exist or, ${isUpdate.message}`);
+    }
+
+    return isUpdate;
   }
 }
 
