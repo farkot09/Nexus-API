@@ -1,6 +1,9 @@
 require('../database/mongoConnect');
 const boom = require('@hapi/boom');
 const Reserva = require('../schemas/reservas.schema');
+const LogsServices = require("../services/logs.services");
+
+const logService = new LogsServices();
 //const mongoose = require('mongoose');
 class ReservasServices {
   constructor() {
@@ -44,6 +47,14 @@ class ReservasServices {
     if (isSaved.errors) {
       throw boom.notFound(`Reserva not Created, ${isSaved._message}`);
     }
+
+    const dataLog = {
+      tipo:"Reserva",
+      id_tipo:isSaved.id,
+      accion:"Creacion",
+    }
+
+    await logService.create(dataLog)
     return isSaved;
   }
 
@@ -73,6 +84,8 @@ class ReservasServices {
     if (ifExist.message) {
       throw boom.badRequest(`error, invalid id , ${ifExist.message}`);
     }
+
+
     return ifExist;
   }
 

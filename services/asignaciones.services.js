@@ -3,10 +3,12 @@ const boom = require('@hapi/boom');
 const Asignacion = require('../schemas/asignaciones.schema');
 const ReservasServices = require('../services/reservas.services');
 const ClientesServices = require('../services/clientes.services');
+const LogsServices = require("../services/logs.services");
 const sendMail = require('../database/emailer');
 
 const Reservaservice = new ReservasServices();
 const Clienteservice = new ClientesServices();
+const logService = new LogsServices();
 class AsignacionesServices {
   constructor() {
     this.asignaciones = [];
@@ -60,7 +62,7 @@ class AsignacionesServices {
         .then((savedAsignacion) => {
           reserva.asignaciones.push(savedAsignacion._id);
           Reservaservice.update(reserva.id, reserva);
-          sendMail(savedAsignacion._id);
+          //sendMail(savedAsignacion._id);
           return (isSaved = savedAsignacion);
         })
         .catch((err) => {
@@ -212,6 +214,14 @@ class AsignacionesServices {
         return (isUpload = err);
       });
 
+      const dataLog = {
+        tipo:"Asignacion",
+        id_tipo:isUpload.id,
+        accion:"Carga Documentos",
+      }
+
+      await logService.create(dataLog)
+
     return isUpload;
   }
 
@@ -257,6 +267,14 @@ class AsignacionesServices {
     if (isUpdate.message) {
       throw boom.badRequest(`Error, not exist or, ${isUpdate.message}`);
     }
+
+    const dataLog = {
+      tipo:"Asignacion",
+      id_tipo:isUpdate.id,
+      accion:"Actualizacion Documentos",
+    }
+
+    await logService.create(dataLog)
 
     return isUpdate;
   }
