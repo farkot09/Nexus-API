@@ -8,7 +8,10 @@ const reservasSchema = new Schema({
   vassel: String,
   fecha_reserva: Date,
   fecha_cierre: Date,
-  asignaciones: [],
+  asignaciones: [{
+    type: Schema.Types.ObjectId,
+    ref:"Asignacion"
+  }],
   activo: Boolean,
 });
 

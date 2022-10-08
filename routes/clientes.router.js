@@ -13,6 +13,26 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+router.get('/asignaciones/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const cliente = await service.findAsignations(id);
+    res.json(cliente);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/asignaciones', async (req, res, next) => {
+  try {
+    const { body } = req;
+    const cliente = await service.findAsignationsForDocumentation(body);
+    res.json(cliente);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -25,7 +45,7 @@ router.get('/:id', async (req, res, next) => {
 
 router.post("/", async (req, res, next)=>{
   try {
-    const body = req.body;
+    const {body} = req;
     const newCliente = await service.create(body)
     res.status(201).json(newCliente);
   } catch (error) {
@@ -36,7 +56,7 @@ router.post("/", async (req, res, next)=>{
 router.patch("/:id", async (req, res, next) => {
   try {
     const {id} = req.params;
-    const body = req.body;
+    const {body} = req;
     const updateCliente = await service.update(id, body)
     res.json(updateCliente)
   } catch (error) {

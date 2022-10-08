@@ -5,7 +5,7 @@ const ReservasServices = require('../services/reservas.services');
 const service = new ReservasServices();
 
 router.get('/', async (req, res) => {
-  const reservas = await service.find();
+  const reservas = await service.find()
   res.json(reservas);
 });
 

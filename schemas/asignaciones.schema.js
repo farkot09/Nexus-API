@@ -5,17 +5,25 @@ const asignacionesSchema = new Schema({
   roe: String,
   booking: String,
   modalidad: String,
-  cantidad: String,
-  peso: String,
-  cubicaje: String,
+  cantidad: Number,
+  tipo_empaque: String,
+  peso: Number,
+  cubicaje: Number,
   producto: String,
   destino_final: String,
   medidas: String,
   agencia_aduanas: String,
   fecha_creacion: Date,
   activo: Boolean,
-  id_reserva: String,
-  id_cliente: String,
+  id_reserva: [{
+    type: Schema.Types.ObjectId,
+    ref:"Reserva"
+  }],
+  id_cliente: [{
+    type: Schema.Types.ObjectId,
+    ref:"Cliente"
+  }],
+  documentacion:[],
 });
 
 asignacionesSchema.set('toJSON', {

@@ -50,7 +50,7 @@ class ReservasServices {
   //TODAS LAS RESERVAS
 
   async find() {
-    await Reserva.find({}).then((result) => {
+    await Reserva.find({}).populate("asignaciones").then((result) => {
       this.reservas = result;
     });
     return this.reservas;
@@ -63,7 +63,7 @@ class ReservasServices {
     await Reserva.findById(id)
       .then((reserva) => {
         if(!reserva){
-          return ifExist = {message:"No existe el id"}
+          return ifExist = {message:"No existe el ID de la reserva"}
         }
         return (ifExist = reserva);
       })
@@ -88,13 +88,14 @@ class ReservasServices {
       vassel: changes.vassel,
       fecha_reserva: new Date(),
       fecha_cierre: new Date(),
+      asignaciones: changes.asignaciones,
       activo: changes.activo,
     });
 
     await Reserva.findByIdAndUpdate(id, newReservaInfo, { new: true })
       .then((reserva) => {
         if(!reserva){
-          return isUpdate = {message:"No existe el id"}
+          return isUpdate = {message:"No existe el ID de la reserva"}
         }
         return (isUpdate = reserva);
       })
