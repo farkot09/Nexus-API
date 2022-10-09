@@ -18,12 +18,14 @@ class LogsServices {
       tipo,
       id_tipo,
       accion,
+      id_usuario,
       //fecha
     } = data;
     const newLog = new Log({
-      tipo,
+      tipo:tipo.trim(),
       id_tipo,
-      accion,
+      accion:accion.trim(),
+      id_usuario,
       fecha: new Date(),
     });
 

@@ -3,8 +3,9 @@ const boom = require('@hapi/boom');
 const Asignacion = require('../schemas/asignaciones.schema');
 const ReservasServices = require('../services/reservas.services');
 const ClientesServices = require('../services/clientes.services');
-const LogsServices = require("../services/logs.services");
+const LogsServices = require('../services/logs.services');
 const sendMail = require('../database/emailer');
+const fs = require('fs');
 
 const Reservaservice = new ReservasServices();
 const Clienteservice = new ClientesServices();
@@ -12,6 +13,7 @@ const logService = new LogsServices();
 class AsignacionesServices {
   constructor() {
     this.asignaciones = [];
+    this.sesionIdUsuario = 'Sin Registrar';
   }
 
   //CREAR ASIGNACION
@@ -40,17 +42,17 @@ class AsignacionesServices {
     const cliente = await Clienteservice.findOne(id_cliente);
     if (reserva && cliente) {
       const newAsignacion = new Asignacion({
-        roe,
-        booking,
+        roe: roe.toUpperCase().trim(),
+        booking: booking.toUpperCase().trim(),
         modalidad,
         cantidad,
-        tipo_empaque,
+        tipo_empaque: tipo_empaque.toUpperCase().trim(),
         peso,
         cubicaje,
-        producto,
-        destino_final,
-        medidas,
-        agencia_aduanas,
+        producto: producto.toUpperCase().trim(),
+        destino_final: destino_final.toUpperCase().trim(),
+        medidas: medidas.toUpperCase().trim(),
+        agencia_aduanas: agencia_aduanas.toUpperCase().trim(),
         fecha_creacion: new Date(),
         activo,
         id_reserva,
@@ -72,6 +74,18 @@ class AsignacionesServices {
       if (isSaved.errors) {
         throw boom.notFound(`error de asignacion, ${isSaved._message}`);
       }
+
+      const dataLog = {
+        tipo: 'Asignacion',
+        id_tipo: isSaved.id,
+        accion: 'Creacion',
+        id_usuario: this.sesionIdUsuario,
+      };
+
+      await logService.create(dataLog);
+      fs.mkdir(`upload/${isSaved.id}`, (err) => {
+        if (err) console.log('Error al crear Directorio');
+      });
       return isSaved;
     } else {
       isSaved = { errors: 404, message: 'no existe el id' };
@@ -117,17 +131,17 @@ class AsignacionesServices {
     let isUpdate = {};
     const newAsignacion = new Asignacion({
       _id: id,
-      roe: changes.roe,
-      booking: changes.booking,
+      roe: changes.roe.toUpperCase().trim(),
+      booking: changes.booking.toUpperCase().trim(),
       modalidad: changes.modalidad,
       cantidad: changes.cantidad,
-      tipo_empaque: changes.tipo_empaque,
+      tipo_empaque: changes.tipo_empaque.toUpperCase().trim(),
       peso: changes.peso,
       cubicaje: changes.cubicaje,
-      producto: changes.producto,
-      destino_final: changes.destino_final,
-      medidas: changes.medidas,
-      agencia_aduanas: changes.agencia_aduanas,
+      producto: changes.producto.toUpperCase().trim(),
+      destino_final: changes.destino_final.toUpperCase().trim(),
+      medidas: changes.medidas.toUpperCase().trim(),
+      agencia_aduanas: changes.agencia_aduanas.toUpperCase().trim(),
       fecha_creacion: changes.fecha_creacion,
       activo: changes.activo,
       id_reserva: changes.id_reserva,
@@ -147,6 +161,15 @@ class AsignacionesServices {
     if (isUpdate.message) {
       throw boom.badRequest(`Error not exist or, ${isUpdate.message}`);
     }
+    const dataLog = {
+      tipo: 'Asignacion',
+      id_tipo: isUpdate.id,
+      accion: 'Actualizacion',
+      id_usuario: this.sesionIdUsuario,
+    };
+
+    await logService.create(dataLog);
+
     return isUpdate;
   }
 
@@ -166,6 +189,14 @@ class AsignacionesServices {
     if (isDelete.message) {
       throw boom.badRequest(`Error, not exist or, ${isDelete.message}`);
     }
+    const dataLog = {
+      tipo: 'Asignacion',
+      id_tipo: isDelete.id,
+      accion: 'Eliminar',
+      id_usuario: this.sesionIdUsuario,
+    };
+
+    await logService.create(dataLog);
 
     return {
       message: 'Eliminado Exitosamente',
@@ -173,12 +204,23 @@ class AsignacionesServices {
     };
   }
 
-  async uploadDocumentation(id, data) {
+  async uploadDocumentation(id, data, nombreArchivo) {
+    const { tipo_documento, estado } = data;
     let isUpload = {};
-    const { tipo_documento, url, estado } = data;
+    const ruta = `upload/${nombreArchivo}`;
+    const nuevoNombre = `upload/${id}/${tipo_documento}.pdf`;
+
+    if (fs.existsSync(ruta)) {
+      fs.rename(ruta, ruta.replace(ruta, nuevoNombre), (err) => {
+        if (err) throw boom.badRequest('Error al subir archivos');
+      });
+    } else {
+      throw boom.badRequest('Error al subir archivos');
+    }
+
     const newDocu = {
       tipo_documento,
-      url,
+      url: `/upload/${id}/${tipo_documento}.pdf`.split(' ').join(''),
       estado,
       observacion: 'Sin Observaciones',
       fecha: new Date(),
@@ -214,13 +256,14 @@ class AsignacionesServices {
         return (isUpload = err);
       });
 
-      const dataLog = {
-        tipo:"Asignacion",
-        id_tipo:isUpload.id,
-        accion:"Carga Documentos",
-      }
+    const dataLog = {
+      tipo: 'Asignacion',
+      id_tipo: isUpload.id,
+      accion: 'Carga Documentos',
+      d_usuario: this.sesionIdUsuario,
+    };
 
-      await logService.create(dataLog)
+    await logService.create(dataLog);
 
     return isUpload;
   }
@@ -269,12 +312,13 @@ class AsignacionesServices {
     }
 
     const dataLog = {
-      tipo:"Asignacion",
-      id_tipo:isUpdate.id,
-      accion:"Actualizacion Documentos",
-    }
+      tipo: 'Asignacion',
+      id_tipo: isUpdate.id,
+      accion: 'Actualizacion Documentos',
+      d_usuario: this.sesionIdUsuario,
+    };
 
-    await logService.create(dataLog)
+    await logService.create(dataLog);
 
     return isUpdate;
   }

@@ -8,6 +8,7 @@ const logService = new LogsServices();
 class ReservasServices {
   constructor() {
     this.reservas = [];
+    this.sesionIdUsuario = "Sin Registrar"
   }
 
   //CREAR RESERVA
@@ -24,10 +25,10 @@ class ReservasServices {
       activo,
     } = data;
     const newReserva = new Reserva({
-      numero_reserva,
-      destino,
-      resumen,
-      vassel,
+      numero_reserva:numero_reserva.toUpperCase().trim(),
+      destino:destino.toUpperCase().trim(),
+      resumen:resumen.toUpperCase().trim(),
+      vassel:vassel.toUpperCase().trim(),
       fecha_reserva: new Date(),
       fecha_cierre: new Date(),
       asignaciones: [],
@@ -48,10 +49,13 @@ class ReservasServices {
       throw boom.notFound(`Reserva not Created, ${isSaved._message}`);
     }
 
+
     const dataLog = {
       tipo:"Reserva",
       id_tipo:isSaved.id,
       accion:"Creacion",
+      id_usuario:this.sesionIdUsuario
+
     }
 
     await logService.create(dataLog)
@@ -120,6 +124,16 @@ class ReservasServices {
       throw boom.badRequest(`error not exist or , ${isUpdate.message}`);
     }
 
+
+    const dataLog = {
+      tipo:"Reserva",
+      id_tipo:isUpdate.id,
+      accion:"Actualizacion",
+      id_usuario:this.sesionIdUsuario
+    }
+
+    await logService.create(dataLog)
+
     return isUpdate;
   }
 
@@ -136,6 +150,16 @@ class ReservasServices {
     if(isDelete.message){
       throw boom.badRequest(`error, not exist or, ${isDelete.message}`)
     }
+
+
+    const dataLog = {
+      tipo:"Reserva",
+      id_tipo:isDelete.id,
+      accion:"Eliminar",
+      id_usuario:this.sesionIdUsuario
+    }
+
+    await logService.create(dataLog)
     return {
       message: "ELiminado exitosamente",
       id,

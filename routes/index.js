@@ -5,6 +5,7 @@ const asignacionesRouter = require("./asginaciones.router")
 const logsRouter = require("./logs.router")
 const usuariosRouter = require("./usuarios.router")
 
+
 function routerApi(app){
   const router = express.Router();
   app.use("/api/v1", router)

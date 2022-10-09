@@ -1,14 +1,29 @@
 const express = require("express")
 const router = express.Router();
 const AsignacionesServices = require("../services/asignaciones.services")
+const multer = require("multer")
+
+
+let nombreArchivo = {}
+const storage = multer.diskStorage({
+  destination: function(req, file, cb){
+    cb(null, "upload/")
+  },
+  filename: function(req,file,cb){
+    nombreArchivo = Date.now() + ".pdf";
+    cb(null, nombreArchivo)
+  }
+})
+
+const upload = multer({storage: storage})
 
 const service = new AsignacionesServices();
 
-router.post('/subirDocumentos/:id', async (req, res, next) => {
+router.post('/subirDocumentos/:id',upload.single("miArchvo") ,async (req, res, next) => {
   try {
     const { id } = req.params;
     const { body } = req;
-    const newDocumentation = await service.uploadDocumentation(id, body);
+    const newDocumentation = await service.uploadDocumentation(id, body,nombreArchivo);
     res.status(201).json(newDocumentation);
   } catch (error) {
     next(error);

@@ -2,10 +2,14 @@ require('../database/mongoConnect');
 const boom = require('@hapi/boom');
 const Cliente = require('../schemas/clientes.schema');
 const Asignacion = require('../schemas/asignaciones.schema');
+const LogsServices = require('../services/logs.services');
+
+const logService = new LogsServices();
 
 class ClientesServices {
   constructor() {
     this.clientes = [];
+    this.sesionIdUsuario = 'Sin Registrar';
   }
 
   //CREAR CLIENTE
@@ -21,11 +25,11 @@ class ClientesServices {
       activo,
     } = data;
     const newCliente = new Cliente({
-      nit,
-      razon_social,
-      correo,
-      telefono,
-      nombre_contacto,
+      nit: nit.toUpperCase().trim(),
+      razon_social: razon_social,
+      correo: correo.trim(),
+      telefono: telefono.toUpperCase().trim(),
+      nombre_contacto: nombre_contacto.toUpperCase().trim(),
       fecha_creacion,
       activo,
     });
@@ -44,6 +48,15 @@ class ClientesServices {
     if (isSaved.errors) {
       throw boom.notFound(`Cliente Not Created, ${isSaved._message}`);
     }
+
+    const dataLog = {
+      tipo: 'Clientes',
+      id_tipo: isSaved.id,
+      accion: 'Creacion',
+      id_usuario: this.sesionIdUsuario,
+    };
+
+    await logService.create(dataLog);
 
     return isSaved;
   }
@@ -82,11 +95,11 @@ class ClientesServices {
     let isUpdate = {};
     const newClienteInfo = new Cliente({
       _id: id,
-      nit: changes.nit,
-      razon_social: changes.razon_social,
-      correo: changes.correo,
-      telefono: changes.telefono,
-      nombre_contacto: changes.nombre_contacto,
+      nit: changes.nit.toUpperCase().trim(),
+      razon_social: changes.razon_social.toUpperCase().trim(),
+      correo: changes.correo.trim(),
+      telefono: changes.telefono.toUpperCase().trim(),
+      nombre_contacto: changes.nombre_contacto.toUpperCase().trim(),
       fecha_creacion: new Date(),
       activo: changes.activo,
     });
@@ -104,6 +117,15 @@ class ClientesServices {
     if (isUpdate.message) {
       throw boom.badRequest(`error, not exist or, ${isUpdate.message}`);
     }
+
+    const dataLog = {
+      tipo: 'Clientes',
+      id_tipo: isUpdate.id,
+      accion: 'Actualizacion',
+      id_usuario: this.sesionIdUsuario,
+    };
+
+    await logService.create(dataLog);
 
     return isUpdate;
   }
@@ -123,6 +145,15 @@ class ClientesServices {
     if (isDelete.message) {
       throw boom.badRequest(`error, not exist or, ${isDelete.message}`);
     }
+
+    const dataLog = {
+      tipo: 'Clientes',
+      id_tipo: isDelete.id,
+      accion: 'Eliminar',
+      id_usuario: this.sesionIdUsuario,
+    };
+
+    await logService.create(dataLog);
     return {
       message: 'Eliminado Exitosamente',
       id,

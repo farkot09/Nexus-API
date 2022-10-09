@@ -5,6 +5,7 @@ const logsSchema = new Schema({
   tipo:String,
   id_tipo:String,
   accion:String,
+  id_usuario:String,
   fecha:Date
 });
 

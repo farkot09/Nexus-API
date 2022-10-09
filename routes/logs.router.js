@@ -5,7 +5,7 @@ const LogsServices = require('../services/logs.services');
 const service = new LogsServices();
 
 
-router.get('/', async (req, res, next) => {
+router.get('/',async (req, res, next) => {
   try {
     const logs = await service.find();
     res.json(logs);
@@ -24,7 +24,7 @@ router.get('/:tipo', async (req, res, next) => {
   }
 });
 
-router.post('/', async (req, res, next) => {
+router.post('/',async (req, res, next) => {
   const {body} = req
   try {
     const logs = await service.create(body);
@@ -33,6 +33,7 @@ router.post('/', async (req, res, next) => {
     next(error)
   }
 });
+
 
 
 module.exports = router;

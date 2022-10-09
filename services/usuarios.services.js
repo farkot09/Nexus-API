@@ -16,11 +16,11 @@ class UsuariosServices {
     const { correo, nombre, telefono, password,rol, activo } = data;
 
     const newUsuario = new Usuario({
-      correo,
-      nombre,
-      telefono,
+      correo:correo.trim(),
+      nombre:nombre.toUpperCase().trim(),
+      telefono:telefono.trim(),
       activo,
-      password,
+      password:password.trim(),
       rol,
       fecha: new Date(),
     });
