@@ -2,7 +2,7 @@ require("dotenv").config()
 require("./database/mongoConnect")
 const express = require('express');
 const app = express();
-//const cors = require('cors');
+const cors = require('cors');
 const port = process.env.PORT ;
 const routerApi = require('./routes');
 const {
@@ -16,7 +16,7 @@ app.use(express.json());
 
 // inicio configuracion de acceso CORS
 
-//app.use(cors);
+app.use(cors());
 
 // FIN configuracion de acceso CORS
 

@@ -5,7 +5,7 @@ const Log = require('../schemas/logs.schema');
 class LogsServices {
   async find() {
     let data = {};
-    await Log.find({}).then((logs) => {
+    await Log.find({}).sort({fecha:"desc"}).then((logs) => {
       return (data = logs);
     });
 
