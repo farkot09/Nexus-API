@@ -100,7 +100,7 @@ class ClientesServices {
       correo: changes.correo.trim(),
       telefono: changes.telefono.toUpperCase().trim(),
       nombre_contacto: changes.nombre_contacto.toUpperCase().trim(),
-      fecha_creacion: new Date(),
+      fecha_creacion: changes.fecha_creacion,
       activo: changes.activo,
     });
 

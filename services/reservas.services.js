@@ -19,8 +19,8 @@ class ReservasServices {
       destino,
       resumen,
       vassel,
-      //fecha_reserva,
-      //fecha_cierre,
+      fecha_reserva,
+      fecha_cierre,
      // asignaciones,
       activo,
     } = data;
@@ -29,8 +29,8 @@ class ReservasServices {
       destino:destino.toUpperCase().trim(),
       resumen:resumen.toUpperCase().trim(),
       vassel:vassel.toUpperCase().trim(),
-      fecha_reserva: new Date(),
-      fecha_cierre: new Date(),
+      fecha_reserva: fecha_reserva,
+      fecha_cierre: fecha_cierre,
       asignaciones: [],
       activo,
     });
@@ -103,8 +103,8 @@ class ReservasServices {
       destino: changes.destino,
       resumen: changes.resumen,
       vassel: changes.vassel,
-      fecha_reserva: new Date(),
-      fecha_cierre: new Date(),
+      fecha_reserva: changes.fecha_reserva,
+      fecha_cierre: changes.fecha_cierre,
       asignaciones: changes.asignaciones,
       activo: changes.activo,
     });
