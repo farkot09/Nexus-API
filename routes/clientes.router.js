@@ -32,7 +32,15 @@ router.post('/asignaciones', async (req, res, next) => {
     next(error);
   }
 });
-
+router.get('/nit/:nit', async (req, res, next) => {
+  try {
+    const { nit } = req.params;
+    const cliente = await service.findOnebyNit(nit)
+    res.json(cliente);
+  } catch (error) {
+    next(error);
+  }
+});
 router.get('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -42,6 +50,7 @@ router.get('/:id', async (req, res, next) => {
     next(error);
   }
 });
+
 
 router.post("/", async (req, res, next)=>{
   try {

@@ -91,6 +91,24 @@ class ClientesServices {
     return ifExist;
   }
 
+  async findOnebyNit(nit) {
+    let ifExist = {};
+    await Cliente.find({nit})
+      .then((cliente) => {
+        if (!cliente) {
+          return (ifExist = { message: 'No existe el nit' });
+        }
+        return (ifExist = cliente);
+      })
+      .catch((err) => {
+        return (ifExist = err);
+      });
+    if (ifExist.message) {
+      throw boom.badRequest(`error, invalid nit, ${ifExist.message}`);
+    }
+    return ifExist;
+  }
+
   async update(id, changes) {
     let isUpdate = {};
     const newClienteInfo = new Cliente({
