@@ -207,6 +207,7 @@ class AsignacionesServices {
   async uploadDocumentation(id, data, nombreArchivo) {
     const { tipo_documento, estado } = data;
     let isUpload = {};
+    /*
     const ruta = `upload/${nombreArchivo}`;
     const nuevoNombre = `upload/${id}/${tipo_documento}.pdf`;
 
@@ -217,7 +218,7 @@ class AsignacionesServices {
     } else {
       throw boom.badRequest('Error al subir archivos');
     }
-
+*/
     const newDocu = {
       tipo_documento,
       url: `/upload/${id}/${tipo_documento}.pdf`.split(' ').join(''),
