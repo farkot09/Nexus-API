@@ -235,6 +235,45 @@ class ClientesServices {
 
     return ifExist;
   }
+
+  async findDocumentAndDelete(id,documento) {
+    let ifExist = {};
+    let isUpdate = {};
+    await Asignacion.findById(id).then(asignacion => {
+      if (!asignacion) {
+        return (ifExist = { message: 'No existe el ID en las asignaciones' });
+      }
+      return (ifExist = asignacion);
+    })
+
+    const nuevoArray = await ifExist.documentacion.filter(item => item.tipo_documento !== documento)
+    ifExist["documentacion"] = nuevoArray
+    await Asignacion.findByIdAndUpdate(id,ifExist, {new:true})
+    .then((asignacion) => {
+      if (!asignacion) {
+        return (isUpdate = { message: 'No existe el Id' });
+      }
+      return (isUpdate = asignacion);
+    }).catch((err) => {
+      return (isUpdate = err);
+    });
+    if (isUpdate.message) {
+      throw boom.badRequest(`error, not exist or, ${isUpdate.message}`);
+    }
+
+    const dataLog = {
+      tipo: 'Clientes',
+      id_tipo: isUpdate.id,
+      accion: 'Eliminar',
+      id_usuario: this.sesionIdUsuario,
+    };
+
+    await logService.create(dataLog);
+
+    return isUpdate;
+
+
+  }
 }
 
 module.exports = ClientesServices;

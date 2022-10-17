@@ -13,6 +13,16 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+router.get('/asignacion/:id/:tipodocumento', async (req, res, next) => {
+  try {
+    const { id,tipodocumento } = req.params;
+    const cliente = await service.findDocumentAndDelete(id,tipodocumento);
+    res.json(cliente);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get('/asignaciones/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
